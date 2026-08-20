@@ -90,8 +90,16 @@ worth verifying, in this order:
 4. Copy `.env.example` to `.env.local` and fill in every value.
 5. `npm run dev`
 
-## Not yet built
+## Product surfaces
 
-Dashboard, docs, and receipts pages from the main app weren't ported — the
-demo flow is landing → connect wallet → register a source → ask a research
-question. Add them back if the video needs them.
+- `/research` runs funded, consensus-grounded research and displays citation
+  and settlement receipts with the completed answer.
+- `/register-article` lets wallet-authenticated creators register and price a
+  public source.
+- `/dashboard` shows the connected creator's registered sources, settled
+  citations, and USDC earnings.
+- `/docs` explains the researcher and creator workflows, payments, refunds,
+  troubleshooting, and current demo limitations.
+
+There is no standalone receipts page yet; receipts are shown within each
+completed research result and retained in research history.
