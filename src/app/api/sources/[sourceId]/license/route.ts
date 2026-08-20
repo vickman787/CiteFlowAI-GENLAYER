@@ -3,6 +3,10 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import crypto from 'crypto'
 
+function firstRelation<T>(value: T | T[] | null | undefined): T | undefined {
+  return Array.isArray(value) ? value[0] : value || undefined
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sourceId: string }> }
@@ -10,8 +14,9 @@ export async function GET(
   try {
     const { sourceId } = await params
     const supabase = await createClient()
+    const admin = createAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await admin
       .from('sources')
       .select('price_usdc, creator_id, creator_profiles(user_id, profiles(wallet_address))')
       .eq('id', sourceId)
@@ -21,8 +26,10 @@ export async function GET(
       return NextResponse.json({ error: 'Source not found' }, { status: 404 })
     }
 
-    const source = data as any;
-    const walletAddress = source.creator_profiles?.profiles?.wallet_address
+    const source = data as any
+    const creatorProfile = firstRelation(source.creator_profiles)
+    const creatorUserProfile = firstRelation(creatorProfile?.profiles)
+    const walletAddress = creatorUserProfile?.wallet_address
 
     if (!walletAddress) {
       return NextResponse.json(
@@ -55,6 +62,7 @@ export async function POST(
   try {
     const { sourceId } = await params
     const supabase = await createClient()
+    const admin = createAdminClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const body = await request.json()
@@ -65,7 +73,10 @@ export async function POST(
       return NextResponse.json({ error: 'Missing payment authorization payload' }, { status: 400 })
     }
 
-    const { data: source, error: sourceError } = await supabase
+    // The researcher is not necessarily the creator. Resolve the creator's
+    // payout wallet with the server-only client because profiles RLS correctly
+    // hides another user's wallet from the researcher session.
+    const { data: source, error: sourceError } = await admin
       .from('sources')
       .select('price_usdc, creator_profiles(profiles(wallet_address))')
       .eq('id', sourceId)
@@ -79,12 +90,13 @@ export async function POST(
       return NextResponse.json({ error: 'Insufficient payment amount' }, { status: 400 })
     }
 
-    const recipientWallet = (source as any).creator_profiles?.profiles?.wallet_address
+    const creatorProfile = firstRelation((source as any).creator_profiles)
+    const creatorUserProfile = firstRelation(creatorProfile?.profiles)
+    const recipientWallet = creatorUserProfile?.wallet_address
     if (!recipientWallet) {
       return NextResponse.json({ error: 'Creator wallet not found' }, { status: 400 })
     }
 
-    const admin = createAdminClient()
     const { data: paymentAuth, error: authError } = await admin
       .from('payment_authorizations')
       .select('id, status, source_id, amount_usdc, recipient_address, research_sessions!inner(user_id)')
