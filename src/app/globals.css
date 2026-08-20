@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+/* ── THE TERMINAL — GenLayer cobalt command deck ─────────────────── */
+
+@theme {
+  --color-paper: #070707;          /* Carbon Void */
+  --color-panel: #101010;          /* raised surfaces */
+  --color-panel-deep: #0B0B0B;     /* inputs, wells */
+  --color-ink: #F5F5F5;            /* Ceramic Node */
+  --color-soft-ink: #CACACA;       /* Chassis */
+  --color-olive: #A0A0A0;          /* muted text, labels */
+  --color-faint: #606060;          /* Asphalt */
+  --color-signal-green: #110FFF;   /* Kinetic Cobalt primary */
+  --color-success: #00FF66;        /* successful settlement/status */
+  --color-amber: #CACACA;          /* neutral warnings */
+  --color-rust: #FF2B2B;           /* Error */
+  --color-border-subtle: rgba(245, 245, 245, 0.1);
+  --color-border-strong: rgba(245, 245, 245, 0.22);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-mono); /* terminal theme: headings render mono */
+}
+
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --green-glow: rgba(17, 15, 255, 0.24);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.1) 2px 4px);
+  z-index: 30;
+  opacity: 0.3;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-ink);
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 1.5rem;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--color-signal-green);
+    color: var(--color-paper);
+    border: 1px solid var(--color-signal-green);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 24px var(--green-glow);
+    filter: brightness(1.08);
+  }
+
+  .btn-highlight {
+    background-color: transparent;
+    color: var(--color-signal-green);
+    border: 1px solid var(--color-signal-green);
+  }
+  .btn-highlight:hover:not(:disabled) {
+    background-color: var(--green-glow);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-border-strong);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-ink);
+    background-color: rgba(232, 237, 218, 0.05);
+  }
+
+  .input-field {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-panel-deep);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-signal-green);
+    box-shadow: 0 0 0 1px var(--color-signal-green), 0 0 30px var(--green-glow);
+  }
+
+  .input-field::placeholder {
+    color: var(--color-faint);
+  }
+
+  .label-text {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-olive);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-panel {
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 2px;
+  }
+
+  .panel-h {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-soft-ink);
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.14em 0.5em;
+    background: var(--color-signal-green);
+    color: var(--color-paper);
+    border-radius: 1px;
+  }
+  .tag.ghost {
+    background: transparent;
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-soft-ink);
+  }
+
+  .glow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+    flex-shrink: 0;
+  }
+
+  .ticker-wrap {
+    overflow: hidden;
+  }
+  .ticker-track {
+    display: inline-flex;
+    white-space: nowrap;
+    width: max-content;
+    animation: ticker-scroll 45s linear infinite;
+  }
+  .ticker-wrap:hover .ticker-track {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-scroll {
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none; }
+  }
+
+  .cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--color-signal-green);
+    animation: blink 1s steps(1) infinite;
+    vertical-align: middle;
+    box-shadow: 0 0 10px var(--green-glow);
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .content-container {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .content-container {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  .section-spacing {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-spacing {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+  }
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-faint);
+  font-weight: 600;
+}
