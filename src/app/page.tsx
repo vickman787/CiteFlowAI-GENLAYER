@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import StatCounter from '@/components/StatCounter'
 import { getNetworkStats } from '@/lib/stats'
 
@@ -14,7 +14,10 @@ function timeAgo(dateString: string) {
 }
 
 export default async function LandingPage() {
-  const supabase = await createClient()
+  // Public network activity must be readable without a logged-in user. The
+  // payment ledger itself is protected by RLS, so use the admin client for
+  // this deliberately narrow, public aggregate query.
+  const supabase = createAdminClient()
 
   const { data: recentPayments } = await supabase
     .from('payment_authorizations')

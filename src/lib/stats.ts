@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 export const CREATOR_SHARE = 0.8 // 20% platform fee
 
@@ -11,7 +11,9 @@ export interface NetworkStats {
 
 // Live network stats from the ledger — used by the ticker and the landing page tiles
 export async function getNetworkStats(): Promise<NetworkStats> {
-  const supabase = await createClient()
+  // These are public aggregate counters. Querying with the anonymous client
+  // returns zero for payment rows because their RLS policy is user-scoped.
+  const supabase = createAdminClient()
 
   const [{ count: answersServed }, { data: settledAmounts }, { count: registeredSources }] = await Promise.all([
     supabase.from('research_sessions').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
